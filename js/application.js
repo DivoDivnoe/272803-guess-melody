@@ -3,6 +3,7 @@ import GameController from './game/game-controller';
 import ResultsController from './results/results-contoller';
 import Model from './model/model';
 import PreloadView from './preload/preload-view';
+import loadAudio from './load-audio';
 
 const ControllerID = {
   WELCOME: ``,
@@ -15,11 +16,12 @@ export default class Application {
     const preloadRemove = this.showPreloader();
     this.model = new Model();
 
-    this.model.load()
+    this.model.load(`questions`)
+      .then(() => this.loadGameAudios())
       .then(() => this.setup())
       .then(preloadRemove)
       .then(() => this.changeController())
-      .catch(window.console.error);
+      .catch((error) => window.console.warn(error));
   }
 
   setup() {
@@ -29,9 +31,20 @@ export default class Application {
       [ControllerID.RESULT]: ResultsController
     };
 
-    window.addEventListener(`hashchange`, () => {
-      this.changeController();
-    });
+    window.addEventListener(`hashchange`, () => this.changeController());
+  }
+
+  loadGameAudios() {
+    let urls = [];
+    this.model.state.questions
+      .forEach(
+        (question) => question.src ?
+        urls.push(question.src) :
+        question.answers.forEach((answer) => urls.push(answer.src))
+      );
+    urls = urls.filter((url) => url);
+
+    return Promise.all(urls.map((url) => loadAudio(url)));
   }
 
   showPreloader() {
@@ -49,56 +62,22 @@ export default class Application {
     location.hash = ControllerID.GAME;
   }
 
-  showResultsScreen(state) {
-    let result = {
-      controller: ControllerID.RESULT
-    };
-
-    switch (state.result) {
-      case `win`:
-        result.params = {
-          result: state.result,
-          time: state.statistics.time,
-          answers: state.statistics.rightAnswers
-        };
-        break;
-      case `loss`:
-        result.params = {
-          result: state.result
-        };
-    }
-
-    location.hash = Application.serialize(result);
+  showResultsScreen() {
+    location.hash = ControllerID.RESULT;
   }
 
   changeController() {
-    const {controller, params} = Application.deserialize(location.hash);
+    const controller = this.getControllerFromHash(location.hash);
     const Controller = this.router[controller];
 
     if (Controller) {
-      new Controller(this, params).init();
+      new Controller(this).init();
     } else {
       this.showWelcome();
     }
   }
 
-  static serialize(state) {
-    const paramKeys = Object.keys(state.params);
-    return `${state.controller}` + (paramKeys.length ? `?` + paramKeys.map((param) => `${param}=${state.params[param]}`).join(`&`) : ``);
-  }
-
-  static deserialize(hash) {
-    const [controller, queryString] = hash.substr(1).split(`?`);
-    const params = {};
-
-    if (queryString) {
-      queryString.split(`&`).forEach((param) => {
-        const [key, value] = param.split(`=`);
-
-        params[key] = value;
-      });
-    }
-
-    return {controller, params};
+  getControllerFromHash(hash) {
+    return hash.substr(1);
   }
 }

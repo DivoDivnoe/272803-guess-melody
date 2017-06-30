@@ -2,9 +2,9 @@ import AbstractView from '../abstract-view';
 import animationObj from '../animate';
 
 export default class TimerView extends AbstractView {
-  constructor(state) {
+  constructor(duration) {
     super();
-    this.state = state;
+    this.duration = duration;
   }
 
   get template() {
@@ -18,9 +18,9 @@ export default class TimerView extends AbstractView {
         </circle>
     
         <div class="timer-value" xmlns="http://www.w3.org/1999/xhtml">
-          <span class="timer-value-mins">0${Math.floor(this.state.duration / 60)}</span>
+          <span class="timer-value-mins">0${Math.floor(this.duration / 60)}</span>
           <span class="timer-value-dots">:</span>
-          <span class="timer-value-secs">0${this.state.duration % 60}</span>
+          <span class="timer-value-secs">0${this.duration % 60}</span>
         </div>
         <div class="main-wrap"></div>
       </svg>
@@ -33,7 +33,7 @@ export default class TimerView extends AbstractView {
     const radius = parseInt(element.getAttributeNS(null, `r`), 10);
     const timer = this.element.querySelector(`.timer-value`);
 
-    const countDown = animationObj.animate(animationObj.getAnimation(0, 1000, this.state.duration), (animation) => {
+    const countDown = animationObj.animate(animationObj.getAnimation(0, 1000, this.duration), (animation) => {
       this.redrawCircle(element, radius, animation);
       this.redrawTimer(timer, animation);
       this.changeState(this.getTime());

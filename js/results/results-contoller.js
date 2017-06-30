@@ -1,40 +1,43 @@
 import ResultsView from './results-view';
-import {history} from '../data';
 
 export default class ResultsController {
-  constructor(application, state) {
-    this.state = state;
+  constructor(application) {
     this.application = application;
-    this.screen = new ResultsView(this.state);
+    this.statistics = this.application.model.state.statistics;
+    this.screen = new ResultsView(this.statistics);
   }
 
   init() {
     this.findComparison();
     this.showScreen();
-    this.application.model.resetState();
-    this.screen.replayHandler = () => this.application.showWelcome();
-  }
+    this.screen.replayHandler = () => {
+      const preloadRemove = this.application.showPreloader();
 
-  findComparison() {
-    if (this.state.result === `win`) {
-      const statistics = history.slice();
-      const myTime = parseInt(this.state.time, 10);
-      const myRightAnswers = parseInt(this.state.answers, 10);
-
-      const worseResults = statistics.filter((result) => {
-        const rightAnswers = result.answers;
-
-        return rightAnswers === myRightAnswers ? result.time > myTime : rightAnswers < myRightAnswers;
-      });
-
-      this.state.comparison = worseResults.length * 100 / statistics.length;
-    }
-
-    return this.state.comparison;
+      this.application.model.resetState()
+        .then(() => this.application.loadGameAudios())
+        .then(preloadRemove)
+        .then(() => this.application.showWelcome());
+    };
   }
 
   showScreen() {
     const app = document.querySelector(`.app`);
     app.replaceChild(this.screen.element, app.querySelector(`.main`));
+  }
+
+  findComparison() {
+    if (this.statistics.result === `win`) {
+      const history = this.application.model.state.history.slice();
+      const myTime = parseInt(this.statistics.time, 10);
+      const myRightAnswers = parseInt(this.statistics.answers, 10);
+
+      const worseResults = history.filter((result) => {
+        const rightAnswers = parseInt(result.answers, 10);
+
+        return rightAnswers === myRightAnswers ? parseInt(result.time, 10) > myTime : rightAnswers < myRightAnswers;
+      });
+
+      this.statistics.comparison = Math.floor(worseResults.length * 100 / history.length);
+    }
   }
 }
