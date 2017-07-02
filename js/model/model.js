@@ -1,28 +1,16 @@
-class AbstractModel {
-  get urlRead() {
-    throw Error(`Abstract method. Define URL for model`);
-  }
-
-  get urlWrite() {
-    throw Error(`Abstract method. Define URL for model`);
-  }
-
-  get initialState() {
-    throw Error(`Abstract method. Define initial state for model`);
-  }
-
-  load() {
-    return fetch(this.urlRead)
-      .then((resp) => resp.json());
-  }
-}
+import {API_URL} from '../constants';
+import AbstractModel from './abstract-model';
 
 export default class Model extends AbstractModel {
   get urlRead() {
-    return `https://intensive-ecmascript-server-btfgudlkpi.now.sh/guess-melody/questions`;
+    return `${API_URL}/questions`;
   }
-  get urlWrite() {
-    return `https://intensive-ecmascript-server-btfgudlkpi.now.sh/guess-melody/stats/:Andron`;
+  get urlWright() {
+    return `${API_URL}/stats/Andrey272803`;
+  }
+
+  get statsUrlRead() {
+    return `${API_URL}/stats/Andrey272803`;
   }
 
   get initialState() {
@@ -32,12 +20,12 @@ export default class Model extends AbstractModel {
       questionNumber: 0,
       questions: null,
       statistics: {
-        time: 0,
-        points: 0,
         rightAnswers: 0,
-        comparison: null
+        result: null,
+        time: 0,
+        answers: 0
       },
-      result: null
+      history: null
     };
   }
 
@@ -52,19 +40,20 @@ export default class Model extends AbstractModel {
     this._state = state;
   }
 
-  load() {
-    return super.load()
+  loadStatistics() {
+    return fetch(this.statsUrlRead)
+      .then((data) => data.json())
       .then((data) => {
-        this.state.questions = data;
+        this.state.history = data;
       });
   }
 
   resetState() {
     this.state = this.initialState;
-    this.load();
+    return this.load();
   }
 
-  changeState(isValidAnswer) {
+  changeState(isValidAnswer, answerTime) {
     const statistics = this.state.statistics;
     const currentState = Object.assign({}, this.state, {
       leftMistakes: this.state.leftMistakes - (isValidAnswer ? 0 : 1),
@@ -73,11 +62,14 @@ export default class Model extends AbstractModel {
         rightAnswers: statistics.rightAnswers + (isValidAnswer ? 1 : 0)
       })
     });
+    if (isValidAnswer) {
+      currentState.statistics.answers = statistics.answers + (answerTime < 10 ? 2 : 1);
+    }
 
     if (currentState.statistics.time === currentState.duration || !currentState.leftMistakes) {
-      currentState.result = `loss`;
-    } else if (currentState.questionNumber === this.state.questions.length) {
-      currentState.result = `win`;
+      currentState.statistics.result = `loss`;
+    } else if (currentState.questionNumber === currentState.questions.length) {
+      currentState.statistics.result = `win`;
     }
 
     this.state = currentState;
@@ -88,12 +80,17 @@ export default class Model extends AbstractModel {
   changeTime(time) {
     const gameTime = this.state.duration - time;
 
-    this.state = Object.assign({}, this.state, {
-      statistics: Object.assign({}, this.state.statistics, {
-        time: gameTime
-      })
+    this.state.statistics = Object.assign({}, this.state.statistics, {
+      time: gameTime
     });
 
     return this.state;
+  }
+
+  load() {
+    return super.load()
+      .then((data) => {
+        this.state.questions = data;
+      });
   }
 }

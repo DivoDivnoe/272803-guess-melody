@@ -2,17 +2,17 @@ import AbstractView from '../abstract-view';
 import {ENTER_KEY_CODE} from '../constants';
 
 export default class ResultsView extends AbstractView {
-  constructor(state) {
+  constructor(stats) {
     super();
-    this.state = state;
+    this.stats = stats;
   }
 
   get template() {
     const resultContent = {
       win: {
         title: `Вы настоящий меломан!`,
-        stat: `За&nbsp;${this.state.time}&nbsp;секунд<br>вы&nbsp;отгадали ${this.state.answers}&nbsp;мелодии`,
-        comparison: `<span class="main-comparison">Это&nbsp;лучше чем у&nbsp;${this.state.comparison}%&nbsp;игроков</span>`
+        stat: `За&nbsp;${this.stats.time}&nbsp;секунд<br>вы&nbsp;отгадали ${this.stats.rightAnswers}&nbsp;мелодии`,
+        comparison: `<span class="main-comparison">Это&nbsp;лучше чем у&nbsp;${this.stats.comparison}%&nbsp;игроков</span>`
       },
       loss: {
         title: `Вы проиграли`,
@@ -20,7 +20,7 @@ export default class ResultsView extends AbstractView {
         comparison: ``
       }
     };
-    const result = resultContent[this.state.result];
+    const result = resultContent[this.stats.result];
 
     return `
     <section class="main main--result">
@@ -33,7 +33,7 @@ export default class ResultsView extends AbstractView {
     `;
   }
 
-  bind() {
+  _bind() {
     const replay = this.element.querySelector(`.main-replay`);
 
     replay.addEventListener(`click`, () => this.replayHandler());

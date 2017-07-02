@@ -1,9 +1,9 @@
-class AbstractView {
+export default class AbstractView {
   get template() {
     throw new Error(`You have to define template for view`);
   }
 
-  render() {
+  _render() {
     const helpElement = document.createElement(`div`);
 
     helpElement.innerHTML = this.template;
@@ -11,17 +11,15 @@ class AbstractView {
     return helpElement.firstElementChild;
   }
 
-  bind() {
+  _bind() {
 
   }
 
   get element() {
     if (!this._element) {
-      this._element = this.render();
-      this.bind();
+      this._element = this._render();
+      this._bind();
     }
     return this._element;
   }
 }
-
-export default AbstractView;

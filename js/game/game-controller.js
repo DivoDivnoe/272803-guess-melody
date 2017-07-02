@@ -1,64 +1,72 @@
 import TimerView from './timer-view';
 import SingerQuestionView from './singer-question-view';
 import GenreQuestionView from './genre-question-view';
+import showScreen from '../show-screen';
 
 export default class GameController {
   constructor(application) {
     this.application = application;
     this.model = this.application.model;
-    this.timer = new TimerView(this.application.model.state);
+    this.timer = new TimerView(this.application.model.state.duration);
   }
 
   init() {
-    this.showTimer();
-    this.timer.finishGame = () => this.application.showResultsScreen(this.model.changeState());
+    showScreen(this.timer.element);
+    this.timer.finishGameHandler = () => this.application.showResultsScreen(this.model.changeState());
     this.timer.changeState = (time) => this.model.changeTime(time);
-    this.getNextQuestion();
-    this.initQuestion();
+    this._initQuestion();
   }
 
-  initQuestion() {
-    this.showQuestion();
-    this.question.checkAnswer = (isValidAnswer) => {
-      this.model.changeState(isValidAnswer);
-      this.checkResult();
-    };
-  }
-
-  showTimer() {
-    const app = document.querySelector(`.app`);
-    app.replaceChild(this.timer.element, app.querySelector(`.main`));
-  }
-
-  showQuestion() {
-    const gameScreen = document.querySelector(`.main--level`);
-
-    gameScreen.replaceChild(this.question.element, document.querySelector(`.main-wrap`));
-  }
-
-  checkResult() {
-    if (this.model.state.result) {
-      this.application.showResultsScreen(this.model.state);
-      this.resetTimer();
-    } else {
-      this.getNextQuestion();
-      this.initQuestion();
-    }
-  }
-
-  resetTimer() {
-    this.timer.stopTimer();
-  }
-
-  getNextQuestion() {
+  _initQuestion() {
     const question = this.model.state.questions[this.model.state.questionNumber];
     const map = {
       artist: SingerQuestionView,
       genre: GenreQuestionView
     };
+    this._question = new map[question.type](question);
 
-    this.question = new map[question.type](question);
+    this._showQuestion();
+    const answerTimeCheckPoint = Date.now();
 
-    return this.question;
+    this._question.answerHandler = (isValidAnswer) => {
+      const answerTime = (Date.now() - answerTimeCheckPoint) / 1000;
+      this.model.changeState(isValidAnswer, answerTime);
+      this._checkResult();
+    };
+  }
+
+  _showQuestion() {
+    const gameScreen = document.querySelector(`.main--level`);
+
+    gameScreen.replaceChild(this._question.element, document.querySelector(`.main-wrap`));
+  }
+
+  _checkResult() {
+    const statistics = this.model.state.statistics;
+
+    switch (statistics.result) {
+      case `win`:
+        const preloadRemove = this.application.showPreloader();
+
+        this._resetTimer();
+        this.model.save({
+          time: statistics.time,
+          answers: statistics.answers
+        })
+          .then(() => this.model.loadStatistics())
+          .then(preloadRemove)
+          .then(() => this.application.showResultsScreen());
+        break;
+      case `loss`:
+        this._resetTimer();
+        this.application.showResultsScreen();
+        break;
+      default:
+        this._initQuestion();
+    }
+  }
+
+  _resetTimer() {
+    this.timer.stopTimer();
   }
 }

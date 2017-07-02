@@ -27,30 +27,30 @@ export default class SingerQuestionView extends AbstractView {
     `;
   }
 
-  bind() {
+  _bind() {
     const firstGameScreen = this.element;
-    const players = this.element.querySelectorAll(`.player-wrapper`);
+    const players = Array.from(this.element.querySelectorAll(`.player-wrapper`));
     const author = this.game.answers.find((answer) => answer[`isCorrect`]).title;
 
-    [...players].forEach((player, index) => initializePlayer(player, this.game.src, true));
+    players.forEach((player, index) => initializePlayer(player, this.game.src, true));
 
     const answerKeyDownHandler = (evt, isValidAnswer) => {
       if (evt.keyCode === ENTER_KEY_CODE) {
-        this.checkAnswer(isValidAnswer);
+        this.answerHandler(isValidAnswer);
       }
     };
 
-    firstGameScreen.querySelectorAll(`.main-answer`).forEach((answer) => {
+    Array.from(firstGameScreen.querySelectorAll(`.main-answer`)).forEach((answer) => {
       const isValidAnswer = author === (answer.textContent).trim();
 
       answer.addEventListener(`click`, () => {
-        this.checkAnswer(isValidAnswer);
+        this.answerHandler(isValidAnswer);
       });
       answer.addEventListener(`keydown`, (evt) => answerKeyDownHandler(evt, isValidAnswer));
     });
   }
 
-  checkAnswer() {
+  answerHandler() {
 
   }
 }

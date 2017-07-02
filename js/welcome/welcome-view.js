@@ -20,7 +20,7 @@ export default class WelcomeView extends AbstractView {
     `;
   }
 
-  bind() {
+  _bind() {
     const startButton = this.element.querySelector(`.main-play`);
 
     startButton.addEventListener(`click`, () => this.startGameHandler());
