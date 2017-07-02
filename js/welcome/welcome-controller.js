@@ -1,4 +1,5 @@
 import WelcomeView from './welcome-view';
+import showScreen from '../show-screen';
 
 export default class WelcomeController {
   constructor(application) {
@@ -7,12 +8,7 @@ export default class WelcomeController {
   }
 
   init() {
-    this.showScreen();
+    showScreen(this.screen.element);
     this.screen.startGameHandler = () => this.application.showGame();
-  }
-
-  showScreen() {
-    const app = document.querySelector(`.app`);
-    app.replaceChild(this.screen.element, app.querySelector(`.main`));
   }
 }

@@ -1,4 +1,5 @@
 import ResultsView from './results-view';
+import showScreen from '../show-screen';
 
 export default class ResultsController {
   constructor(application) {
@@ -8,8 +9,8 @@ export default class ResultsController {
   }
 
   init() {
-    this.findComparison();
-    this.showScreen();
+    this._findComparison();
+    showScreen(this.screen.element);
     this.screen.replayHandler = () => {
       const preloadRemove = this.application.showPreloader();
 
@@ -20,12 +21,7 @@ export default class ResultsController {
     };
   }
 
-  showScreen() {
-    const app = document.querySelector(`.app`);
-    app.replaceChild(this.screen.element, app.querySelector(`.main`));
-  }
-
-  findComparison() {
+  _findComparison() {
     if (this.statistics.result === `win`) {
       const history = this.application.model.state.history.slice();
       const myTime = parseInt(this.statistics.time, 10);

@@ -16,22 +16,24 @@ export default class Application {
     const preloadRemove = this.showPreloader();
     this.model = new Model();
 
-    this.model.load(`questions`)
+    this.model.load()
       .then(() => this.loadGameAudios())
-      .then(() => this.setup())
+      .catch((error) => window.console.warn(error))
+      .then(() => this._setup())
       .then(preloadRemove)
-      .then(() => this.changeController())
-      .catch((error) => window.console.warn(error));
+      .then(() => this._changeController());
   }
 
-  setup() {
-    this.router = {
-      [ControllerID.WELCOME]: WelcomeController,
-      [ControllerID.GAME]: GameController,
-      [ControllerID.RESULT]: ResultsController
-    };
+  showWelcome() {
+    location.hash = ControllerID.WELCOME;
+  }
 
-    window.addEventListener(`hashchange`, () => this.changeController());
+  showGame() {
+    location.hash = ControllerID.GAME;
+  }
+
+  showResultsScreen() {
+    location.hash = ControllerID.RESULT;
   }
 
   loadGameAudios() {
@@ -54,21 +56,19 @@ export default class Application {
     return () => preloadView.hide();
   }
 
-  showWelcome() {
-    location.hash = ControllerID.WELCOME;
+  _setup() {
+    this._router = {
+      [ControllerID.WELCOME]: WelcomeController,
+      [ControllerID.GAME]: GameController,
+      [ControllerID.RESULT]: ResultsController
+    };
+
+    window.addEventListener(`hashchange`, () => this._changeController());
   }
 
-  showGame() {
-    location.hash = ControllerID.GAME;
-  }
-
-  showResultsScreen() {
-    location.hash = ControllerID.RESULT;
-  }
-
-  changeController() {
-    const controller = this.getControllerFromHash(location.hash);
-    const Controller = this.router[controller];
+  _changeController() {
+    const controller = this._getControllerFromHash(location.hash);
+    const Controller = this._router[controller];
 
     if (Controller) {
       new Controller(this).init();
@@ -77,7 +77,7 @@ export default class Application {
     }
   }
 
-  getControllerFromHash(hash) {
+  _getControllerFromHash(hash) {
     return hash.substr(1);
   }
 }

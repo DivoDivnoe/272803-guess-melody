@@ -1,46 +1,5 @@
 import {API_URL} from '../constants';
-
-class DefaultAdapter {
-  toServer() {
-    throw Error(`Abstract method. Define toServer method`);
-  }
-}
-
-const defaultAdapter = new class extends DefaultAdapter {
-  toServer(data) {
-    return JSON.stringify(data);
-  }
-}();
-
-class AbstractModel {
-  get urlRead() {
-    throw Error(`Abstract method. Define URL for model`);
-  }
-
-  get urlWright() {
-    throw Error(`Abstract method. Define URL for model`);
-  }
-
-  get initialState() {
-    throw Error(`Abstract method. Define initial state for model`);
-  }
-
-  load() {
-    return fetch(this.urlRead)
-      .then((resp) => resp.json());
-  }
-
-  save(params, adapter = defaultAdapter) {
-    const settings = {
-      body: adapter.toServer(params),
-      headers: {
-        'Content-type': `application/json`
-      },
-      method: `POST`
-    };
-    return fetch(this.urlWright, settings);
-  }
-}
+import AbstractModel from './abstract-model';
 
 export default class Model extends AbstractModel {
   get urlRead() {
@@ -79,13 +38,6 @@ export default class Model extends AbstractModel {
 
   set state(state) {
     this._state = state;
-  }
-
-  load() {
-    return super.load()
-      .then((data) => {
-        this.state.questions = data;
-      });
   }
 
   loadStatistics() {
@@ -133,5 +85,12 @@ export default class Model extends AbstractModel {
     });
 
     return this.state;
+  }
+
+  load() {
+    return super.load()
+      .then((data) => {
+        this.state.questions = data;
+      });
   }
 }

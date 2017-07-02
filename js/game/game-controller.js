@@ -1,6 +1,7 @@
 import TimerView from './timer-view';
 import SingerQuestionView from './singer-question-view';
 import GenreQuestionView from './genre-question-view';
+import showScreen from '../show-screen';
 
 export default class GameController {
   constructor(application) {
@@ -10,49 +11,44 @@ export default class GameController {
   }
 
   init() {
-    this.showTimer();
-    this.timer.finishGame = () => this.application.showResultsScreen(this.model.changeState());
+    showScreen(this.timer.element);
+    this.timer.finishGameHandler = () => this.application.showResultsScreen(this.model.changeState());
     this.timer.changeState = (time) => this.model.changeTime(time);
-    this.initQuestion();
+    this._initQuestion();
   }
 
-  initQuestion() {
+  _initQuestion() {
     const question = this.model.state.questions[this.model.state.questionNumber];
     const map = {
       artist: SingerQuestionView,
       genre: GenreQuestionView
     };
-    this.question = new map[question.type](question);
+    this._question = new map[question.type](question);
 
-    this.showQuestion();
+    this._showQuestion();
     const answerTimeCheckPoint = Date.now();
 
-    this.question.checkAnswer = (isValidAnswer) => {
+    this._question.answerHandler = (isValidAnswer) => {
       const answerTime = (Date.now() - answerTimeCheckPoint) / 1000;
       this.model.changeState(isValidAnswer, answerTime);
-      this.checkResult();
+      this._checkResult();
     };
   }
 
-  showTimer() {
-    const app = document.querySelector(`.app`);
-    app.replaceChild(this.timer.element, app.querySelector(`.main`));
-  }
-
-  showQuestion() {
+  _showQuestion() {
     const gameScreen = document.querySelector(`.main--level`);
 
-    gameScreen.replaceChild(this.question.element, document.querySelector(`.main-wrap`));
+    gameScreen.replaceChild(this._question.element, document.querySelector(`.main-wrap`));
   }
 
-  checkResult() {
+  _checkResult() {
     const statistics = this.model.state.statistics;
 
     switch (statistics.result) {
       case `win`:
         const preloadRemove = this.application.showPreloader();
 
-        this.resetTimer();
+        this._resetTimer();
         this.model.save({
           time: statistics.time,
           answers: statistics.answers
@@ -62,15 +58,15 @@ export default class GameController {
           .then(() => this.application.showResultsScreen());
         break;
       case `loss`:
-        this.resetTimer();
+        this._resetTimer();
         this.application.showResultsScreen();
         break;
       default:
-        this.initQuestion();
+        this._initQuestion();
     }
   }
 
-  resetTimer() {
+  _resetTimer() {
     this.timer.stopTimer();
   }
 }
