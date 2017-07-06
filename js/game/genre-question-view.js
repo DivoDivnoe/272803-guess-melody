@@ -43,13 +43,13 @@ export default class GenreQuestionView extends AbstractView {
       this.answerHandler(isValidAnswer);
     });
 
-    answerInputs.forEach((input) => {
+    for (let input of answerInputs) {
       input.addEventListener(`change`, () => {
         const checkedAnswerInputs = answerInputs.some((checkbox) => checkbox.checked);
 
         this.element.querySelector(`.genre-answer-send`).disabled = !checkedAnswerInputs;
       });
-    });
+    }
   }
 
   answerHandler() {
