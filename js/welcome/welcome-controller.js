@@ -9,6 +9,6 @@ export default class WelcomeController {
 
   init() {
     showScreen(this.screen.element);
-    this.screen.startGameHandler = () => this.application.showGame();
+    this.screen.startGame = () => this.application.showGame();
   }
 }

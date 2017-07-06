@@ -34,25 +34,27 @@ export default class GenreQuestionView extends AbstractView {
 
     players.forEach((player, index) => initializePlayer(player, this.game.answers[index].src));
 
-    screenForm.addEventListener(`submit`, (evt) => {
+    const submitAnswerHandler = (evt) => {
       evt.preventDefault();
 
       const isInputCheckCorrect = (input, genre) => input.checked ? input.value === genre : input.value !== genre;
       const isValidAnswer = answerInputs.every((answerInput) => isInputCheckCorrect(answerInput, this.game.genre));
 
-      this.answerHandler(isValidAnswer);
-    });
+      this.checkAnswer(isValidAnswer);
+      screenForm.removeEventListener(`submit`, submitAnswerHandler);
+    };
+    screenForm.addEventListener(`submit`, submitAnswerHandler);
 
-    answerInputs.forEach((input) => {
+    for (let input of answerInputs) {
       input.addEventListener(`change`, () => {
         const checkedAnswerInputs = answerInputs.some((checkbox) => checkbox.checked);
 
         this.element.querySelector(`.genre-answer-send`).disabled = !checkedAnswerInputs;
       });
-    });
+    }
   }
 
-  answerHandler() {
+  checkAnswer() {
 
   }
 }

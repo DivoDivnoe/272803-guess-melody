@@ -6,13 +6,18 @@ const updateState = (element, player) => {
 };
 
 
-const syncState = (player, element) => {
-  element.classList.toggle(`player--is-playing`, !player.paused);
+const syncState = (element) => {
+  element.classList.toggle(`player--is-playing`);
 };
 
 
 const switchState = (state, player, element) => {
   if (player.paused) {
+    const nowPlaying = document.querySelector(`.player--is-playing`);
+    if (nowPlaying) {
+      nowPlaying.querySelector(`audio`).pause();
+      syncState(nowPlaying);
+    }
     player.play();
     state.stopAnimation = animationObj.animate(
         animationObj.getAnimation(player.currentTime, 1000, player.duration),
@@ -23,7 +28,7 @@ const switchState = (state, player, element) => {
     state.stopAnimation = null;
   }
 
-  syncState(player, element);
+  syncState(element);
 };
 
 

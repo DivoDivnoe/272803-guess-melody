@@ -78,6 +78,6 @@ export default class Application {
   }
 
   _getControllerFromHash(hash) {
-    return hash.substr(1);
+    return hash ? hash.substr(1) : ``;
   }
 }

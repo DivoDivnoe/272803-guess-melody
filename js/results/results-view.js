@@ -36,15 +36,21 @@ export default class ResultsView extends AbstractView {
   _bind() {
     const replay = this.element.querySelector(`.main-replay`);
 
-    replay.addEventListener(`click`, () => this.replayHandler());
-    replay.addEventListener(`keydown`, (evt) => {
+    const replayHandler = () => {
+      this.replay();
+      replay.removeEventListener(`click`, replayHandler);
+    };
+    const replayKeyDownHandler = (evt) => {
       if (evt.keyCode === ENTER_KEY_CODE) {
         this.replayHandler();
+        replay.removeEventListener(`keydown`, replayKeyDownHandler);
       }
-    });
+    };
+    replay.addEventListener(`click`, replayHandler);
+    replay.addEventListener(`keydown`, replayKeyDownHandler);
   }
 
-  replayHandler() {
+  replay() {
 
   }
 }

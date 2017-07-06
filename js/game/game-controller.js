@@ -28,7 +28,7 @@ export default class GameController {
     this._showQuestion();
     const answerTimeCheckPoint = Date.now();
 
-    this._question.answerHandler = (isValidAnswer) => {
+    this._question.checkAnswer = (isValidAnswer) => {
       const answerTime = (Date.now() - answerTimeCheckPoint) / 1000;
       this.model.changeState(isValidAnswer, answerTime);
       this._checkResult();
@@ -43,9 +43,13 @@ export default class GameController {
 
   _checkResult() {
     const statistics = this.model.state.statistics;
+    const typeOfResult = {
+      WIN: `win`,
+      LOSS: `loss`
+    };
 
     switch (statistics.result) {
-      case `win`:
+      case typeOfResult.LOSS:
         const preloadRemove = this.application.showPreloader();
 
         this._resetTimer();
@@ -57,7 +61,7 @@ export default class GameController {
           .then(preloadRemove)
           .then(() => this.application.showResultsScreen());
         break;
-      case `loss`:
+      case typeOfResult.WIN:
         this._resetTimer();
         this.application.showResultsScreen();
         break;
