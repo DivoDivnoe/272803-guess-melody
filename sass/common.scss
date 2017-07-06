@@ -52,6 +52,14 @@ body {
   border-radius: 50%;
 }
 
+.player .player-control {
+  background-color: #eee;
+}
+
+.player.player--is-playing .player-control {
+  background-color: #ff9749;
+}
+
 .copyright {
   bottom: 2em;
   color: $color-beige;

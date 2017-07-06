@@ -35,29 +35,23 @@ export default class SingerQuestionView extends AbstractView {
 
     players.forEach((player, index) => initializePlayer(player, this.game.src, true));
 
+    const answerKeyDownHandler = (evt, isValidAnswer) => {
+      if (evt.keyCode === ENTER_KEY_CODE) {
+        this.answerHandler(isValidAnswer);
+      }
+    };
+
     for (let answer of answers) {
       const isValidAnswer = author === (answer.textContent).trim();
-      const answerKeyDownHandler = (evt) => {
-        if (evt.keyCode === ENTER_KEY_CODE) {
-          this.checkAnswer(isValidAnswer);
-          for (let it of answers) {
-            it.removeEventListener(`keydown`, answerKeyDownHandler);
-          }
-        }
-      };
-      const answerHandler = () => {
-        this.checkAnswer(isValidAnswer);
-        for (let it of answers) {
-          it.removeEventListener(`click`, answerHandler);
-        }
-      };
 
-      answer.addEventListener(`click`, answerHandler);
-      answer.addEventListener(`keydown`, answerKeyDownHandler);
+      answer.addEventListener(`click`, () => {
+        this.answerHandler(isValidAnswer);
+      });
+      answer.addEventListener(`keydown`, (evt) => answerKeyDownHandler(evt, isValidAnswer));
     }
   }
 
-  checkAnswer() {
+  answerHandler() {
 
   }
 }
