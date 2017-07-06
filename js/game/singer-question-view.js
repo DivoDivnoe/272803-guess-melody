@@ -31,6 +31,7 @@ export default class SingerQuestionView extends AbstractView {
     const firstGameScreen = this.element;
     const players = Array.from(this.element.querySelectorAll(`.player-wrapper`));
     const author = this.game.answers.find((answer) => answer[`isCorrect`]).title;
+    const answers = firstGameScreen.querySelectorAll(`.main-answer`);
 
     players.forEach((player, index) => initializePlayer(player, this.game.src, true));
 
@@ -40,14 +41,14 @@ export default class SingerQuestionView extends AbstractView {
       }
     };
 
-    Array.from(firstGameScreen.querySelectorAll(`.main-answer`)).forEach((answer) => {
+    for (let answer of answers) {
       const isValidAnswer = author === (answer.textContent).trim();
 
       answer.addEventListener(`click`, () => {
         this.answerHandler(isValidAnswer);
       });
       answer.addEventListener(`keydown`, (evt) => answerKeyDownHandler(evt, isValidAnswer));
-    });
+    }
   }
 
   answerHandler() {

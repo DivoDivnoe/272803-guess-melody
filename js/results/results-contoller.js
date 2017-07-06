@@ -1,5 +1,6 @@
 import ResultsView from './results-view';
 import showScreen from '../show-screen';
+import {results} from '../constants';
 
 export default class ResultsController {
   constructor(application) {
@@ -11,7 +12,7 @@ export default class ResultsController {
   init() {
     this._findComparison();
     showScreen(this.screen.element);
-    this.screen.replayHandler = () => {
+    this.screen.replay = () => {
       const preloadRemove = this.application.showPreloader();
 
       this.application.model.resetState()
@@ -22,7 +23,7 @@ export default class ResultsController {
   }
 
   _findComparison() {
-    if (this.statistics.result === `win`) {
+    if (this.statistics.result === results.WIN) {
       const history = this.application.model.state.history.slice();
       const myTime = parseInt(this.statistics.time, 10);
       const myRightAnswers = parseInt(this.statistics.answers, 10);

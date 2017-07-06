@@ -2,6 +2,7 @@ import TimerView from './timer-view';
 import SingerQuestionView from './singer-question-view';
 import GenreQuestionView from './genre-question-view';
 import showScreen from '../show-screen';
+import {results} from '../constants';
 
 export default class GameController {
   constructor(application) {
@@ -45,7 +46,7 @@ export default class GameController {
     const statistics = this.model.state.statistics;
 
     switch (statistics.result) {
-      case `win`:
+      case results.LOSS:
         const preloadRemove = this.application.showPreloader();
 
         this._resetTimer();
@@ -57,7 +58,7 @@ export default class GameController {
           .then(preloadRemove)
           .then(() => this.application.showResultsScreen());
         break;
-      case `loss`:
+      case results.WIN:
         this._resetTimer();
         this.application.showResultsScreen();
         break;

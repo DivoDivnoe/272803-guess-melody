@@ -22,11 +22,15 @@ export default class WelcomeView extends AbstractView {
 
   _bind() {
     const startButton = this.element.querySelector(`.main-play`);
+    const startGameHandler = () => {
+      this.startGame();
+      startButton.removeEventListener(`click`, startGameHandler);
+    };
 
-    startButton.addEventListener(`click`, () => this.startGameHandler());
+    startButton.addEventListener(`click`, startGameHandler);
   }
 
-  startGameHandler() {
+  startGame() {
 
   }
 }

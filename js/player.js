@@ -1,18 +1,26 @@
 import animationObj from './animate';
 
+/*
+ Иногда от бекенда приходят пустые урлы для музыки. Аудио с пустым
+ src не проигрывается, поэтому иногда выглядит, будто что-то сломалось.
+ Я не виноват, это всё бекенд.
+ */
 const updateState = (element, player) => {
   element.querySelector(`.player-status`).style.width =
       `${parseInt(player.currentTime * 100 / player.duration, 10)}%`;
 };
 
-
-const syncState = (player, element) => {
-  element.classList.toggle(`player--is-playing`, !player.paused);
+const syncState = (element) => {
+  element.classList.toggle(`player--is-playing`);
 };
-
 
 const switchState = (state, player, element) => {
   if (player.paused) {
+    const nowPlaying = document.querySelector(`.player--is-playing`);
+    if (nowPlaying) {
+      nowPlaying.querySelector(`audio`).pause();
+      syncState(nowPlaying);
+    }
     player.play();
     state.stopAnimation = animationObj.animate(
         animationObj.getAnimation(player.currentTime, 1000, player.duration),
@@ -23,7 +31,7 @@ const switchState = (state, player, element) => {
     state.stopAnimation = null;
   }
 
-  syncState(player, element);
+  syncState(element);
 };
 
 
@@ -42,7 +50,6 @@ const destroyPlayer = (element, state) => {
 
   return true;
 };
-
 
 const initializePlayer = (element, file, autoplay = false, controllable = true) => {
   let state = {};
