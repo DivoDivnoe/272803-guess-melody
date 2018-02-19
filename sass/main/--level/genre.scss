@@ -8,19 +8,19 @@
   width: 410px;
 }
 
-.genre-answer input[type=checkbox] {
+.genre-answer input[type='checkbox'] {
   position: absolute;
   left: -900em;
 }
 
 .genre-answer-check {
-  background: url("/img/icon-note-inactive.png") no-repeat;
+  background: url('../img/icon-note-inactive.png') no-repeat;
   height: 49px;
   width: 35px;
 }
 
-input[type=checkbox]:checked + .genre-answer-check {
-  background-image: url("/img/icon-note-active.png");
+input[type='checkbox']:checked + .genre-answer-check {
+  background-image: url('../img/icon-note-active.png');
 }
 
 .genre-answer-send {
