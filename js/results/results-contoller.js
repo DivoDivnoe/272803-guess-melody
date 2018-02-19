@@ -1,5 +1,6 @@
 import ResultsView from './results-view';
 import showScreen from '../show-screen';
+import {results} from '../constants';
 
 export default class ResultsController {
   constructor(application) {
@@ -22,9 +23,7 @@ export default class ResultsController {
   }
 
   _findComparison() {
-    const WIN = `win`;
-
-    if (this.statistics.result === WIN) {
+    if (this.statistics.result === results.WIN) {
       const history = this.application.model.state.history.slice();
       const myTime = parseInt(this.statistics.time, 10);
       const myRightAnswers = parseInt(this.statistics.answers, 10);

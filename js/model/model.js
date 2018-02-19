@@ -1,5 +1,6 @@
 import {API_URL} from '../constants';
 import AbstractModel from './abstract-model';
+import {results} from '../constants';
 
 export default class Model extends AbstractModel {
   get urlRead() {
@@ -67,9 +68,9 @@ export default class Model extends AbstractModel {
     }
 
     if (currentState.statistics.time === currentState.duration || !currentState.leftMistakes) {
-      currentState.statistics.result = `loss`;
+      currentState.statistics.result = results.LOSS;
     } else if (currentState.questionNumber === currentState.questions.length) {
-      currentState.statistics.result = `win`;
+      currentState.statistics.result = results.WIN;
     }
 
     this.state = currentState;

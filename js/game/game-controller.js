@@ -2,6 +2,7 @@ import TimerView from './timer-view';
 import SingerQuestionView from './singer-question-view';
 import GenreQuestionView from './genre-question-view';
 import showScreen from '../show-screen';
+import {results} from '../constants';
 
 export default class GameController {
   constructor(application) {
@@ -28,7 +29,7 @@ export default class GameController {
     this._showQuestion();
     const answerTimeCheckPoint = Date.now();
 
-    this._question.checkAnswer = (isValidAnswer) => {
+    this._question.answerHandler = (isValidAnswer) => {
       const answerTime = (Date.now() - answerTimeCheckPoint) / 1000;
       this.model.changeState(isValidAnswer, answerTime);
       this._checkResult();
@@ -43,13 +44,9 @@ export default class GameController {
 
   _checkResult() {
     const statistics = this.model.state.statistics;
-    const typeOfResult = {
-      WIN: `win`,
-      LOSS: `loss`
-    };
 
     switch (statistics.result) {
-      case typeOfResult.LOSS:
+      case results.LOSS:
         const preloadRemove = this.application.showPreloader();
 
         this._resetTimer();
@@ -61,7 +58,7 @@ export default class GameController {
           .then(preloadRemove)
           .then(() => this.application.showResultsScreen());
         break;
-      case typeOfResult.WIN:
+      case results.WIN:
         this._resetTimer();
         this.application.showResultsScreen();
         break;
